@@ -692,9 +692,6 @@ class RoomCreationHandler:
             # we returned the new room to the client at this point.
             logger.error("Unable to send updated alias events in new room: %s", e)
 
-    async def test():
-        logger("test")
-
     async def create_room(
         self,
         requester: Requester,
@@ -734,7 +731,6 @@ class RoomCreationHandler:
                 if server is blocked to some resource being
                 exceeded
         """
-        self.test()
         user_id = requester.user.to_string()
 
         await self.auth_blocking.check_auth_blocking(requester=requester)
