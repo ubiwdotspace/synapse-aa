@@ -731,6 +731,7 @@ class RoomCreationHandler:
                 if server is blocked to some resource being
                 exceeded
         """
+        logger.info("helloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         user_id = requester.user.to_string()
 
         await self.auth_blocking.check_auth_blocking(requester=requester)
