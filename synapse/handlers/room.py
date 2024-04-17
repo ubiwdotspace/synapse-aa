@@ -734,6 +734,8 @@ class RoomCreationHandler:
         user_id = requester.user.to_string()
         logger.info("heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         logger.info(user_id)
+        username = user_id.split(':')[0].lstrip('@')
+        logger.info(username)
 
         await self.auth_blocking.check_auth_blocking(requester=requester)
 
