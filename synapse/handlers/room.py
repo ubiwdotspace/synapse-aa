@@ -732,6 +732,7 @@ class RoomCreationHandler:
                 exceeded
         """
         user_id = requester.user.to_string()
+        logger.info("heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         logger.info(user_id)
 
         await self.auth_blocking.check_auth_blocking(requester=requester)
