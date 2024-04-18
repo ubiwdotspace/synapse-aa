@@ -18,6 +18,7 @@ import logging
 import math
 import random
 import string
+from web3 import Web3
 from collections import OrderedDict
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Tuple
@@ -736,280 +737,315 @@ class RoomCreationHandler:
         logger.info(user_id)
         username = user_id.split(':')[0].lstrip('@')
         logger.info(username)
+        w3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
 
-        await self.auth_blocking.check_auth_blocking(requester=requester)
+        # Contract details
+        contract_address = '0x5DAB3f4abe72Ef9bC3a1CF3b0b73ea46282d0012'
+        abi = [
+            {
+                "constant": True,
+                "inputs": [
+                    {
+                        "name": "owner",
+                        "type": "address"
+                    }
+                ],
+                "name": "balanceOf",
+                "outputs": [
+                    {
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "payable": False,
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ]
 
-        if (
-            self._server_notices_mxid is not None
-            and user_id == self._server_notices_mxid
-        ):
-            # allow the server notices mxid to create rooms
-            is_requester_admin = True
-        else:
-            is_requester_admin = await self.auth.is_server_admin(requester)
+        # Setup the contract
+        contract = w3.eth.contract(address=contract_address, abi=abi)
 
-        # Let the third party rules modify the room creation config if needed, or abort
-        # the room creation entirely with an exception.
-        await self._third_party_event_rules.on_create_room(
-            requester, config, is_requester_admin=is_requester_admin
-        )
+        # Account address whose balance we want to check
+        account_address = username
 
-        invite_3pid_list = config.get("invite_3pid", [])
-        invite_list = config.get("invite", [])
+        # Call the balanceOf function
+        balance = contract.functions.balanceOf(account_address).call()
+        if(balance > 0):
+            await self.auth_blocking.check_auth_blocking(requester=requester)
 
-        # validate each entry for correctness
-        for invite_3pid in invite_3pid_list:
-            if not all(
-                key in invite_3pid
-                for key in ("medium", "address", "id_server", "id_access_token")
+            if (
+                self._server_notices_mxid is not None
+                and user_id == self._server_notices_mxid
             ):
-                raise SynapseError(
-                    HTTPStatus.BAD_REQUEST,
-                    "all of `medium`, `address`, `id_server` and `id_access_token` "
-                    "are required when making a 3pid invite",
-                    Codes.MISSING_PARAM,
-                )
+                # allow the server notices mxid to create rooms
+                is_requester_admin = True
+            else:
+                is_requester_admin = await self.auth.is_server_admin(requester)
 
-        if not is_requester_admin:
-            spam_check = await self._spam_checker_module_callbacks.user_may_create_room(
-                user_id
-            )
-            if spam_check != self._spam_checker_module_callbacks.NOT_SPAM:
-                raise SynapseError(
-                    403,
-                    "You are not permitted to create rooms",
-                    errcode=spam_check[0],
-                    additional_fields=spam_check[1],
-                )
-
-        if ratelimit:
-            # Rate limit once in advance, but don't rate limit the individual
-            # events in the room — room creation isn't atomic and it's very
-            # janky if half the events in the initial state don't make it because
-            # of rate limiting.
-            await self.request_ratelimiter.ratelimit(requester)
-
-        room_version_id = config.get(
-            "room_version", self.config.server.default_room_version.identifier
-        )
-
-        if not isinstance(room_version_id, str):
-            raise SynapseError(400, "room_version must be a string", Codes.BAD_JSON)
-
-        room_version = KNOWN_ROOM_VERSIONS.get(room_version_id)
-        if room_version is None:
-            raise SynapseError(
-                400,
-                "Your homeserver does not support this room version",
-                Codes.UNSUPPORTED_ROOM_VERSION,
+            # Let the third party rules modify the room creation config if needed, or abort
+            # the room creation entirely with an exception.
+            await self._third_party_event_rules.on_create_room(
+                requester, config, is_requester_admin=is_requester_admin
             )
 
-        room_alias = None
-        if "room_alias_name" in config:
-            for wchar in string.whitespace:
-                if wchar in config["room_alias_name"]:
-                    raise SynapseError(400, "Invalid characters in room alias")
+            invite_3pid_list = config.get("invite_3pid", [])
+            invite_list = config.get("invite", [])
 
-            if ":" in config["room_alias_name"]:
-                # Prevent someone from trying to pass in a full alias here.
-                # Note that it's permissible for a room alias to have multiple
-                # hash symbols at the start (notably bridged over from IRC, too),
-                # but the first colon in the alias is defined to separate the local
-                # part from the server name.
-                # (remember server names can contain port numbers, also separated
-                # by a colon. But under no circumstances should the local part be
-                # allowed to contain a colon!)
+            # validate each entry for correctness
+            for invite_3pid in invite_3pid_list:
+                if not all(
+                    key in invite_3pid
+                    for key in ("medium", "address", "id_server", "id_access_token")
+                ):
+                    raise SynapseError(
+                        HTTPStatus.BAD_REQUEST,
+                        "all of `medium`, `address`, `id_server` and `id_access_token` "
+                        "are required when making a 3pid invite",
+                        Codes.MISSING_PARAM,
+                    )
+
+            if not is_requester_admin:
+                spam_check = await self._spam_checker_module_callbacks.user_may_create_room(
+                    user_id
+                )
+                if spam_check != self._spam_checker_module_callbacks.NOT_SPAM:
+                    raise SynapseError(
+                        403,
+                        "You are not permitted to create rooms",
+                        errcode=spam_check[0],
+                        additional_fields=spam_check[1],
+                    )
+
+            if ratelimit:
+                # Rate limit once in advance, but don't rate limit the individual
+                # events in the room — room creation isn't atomic and it's very
+                # janky if half the events in the initial state don't make it because
+                # of rate limiting.
+                await self.request_ratelimiter.ratelimit(requester)
+
+            room_version_id = config.get(
+                "room_version", self.config.server.default_room_version.identifier
+            )
+
+            if not isinstance(room_version_id, str):
+                raise SynapseError(400, "room_version must be a string", Codes.BAD_JSON)
+
+            room_version = KNOWN_ROOM_VERSIONS.get(room_version_id)
+            if room_version is None:
                 raise SynapseError(
                     400,
-                    "':' is not permitted in the room alias name. "
-                    "Please note this expects a local part — 'wombat', not '#wombat:example.com'.",
+                    "Your homeserver does not support this room version",
+                    Codes.UNSUPPORTED_ROOM_VERSION,
                 )
 
-            room_alias = RoomAlias(config["room_alias_name"], self.hs.hostname)
-            mapping = await self.store.get_association_from_room_alias(room_alias)
+            room_alias = None
+            if "room_alias_name" in config:
+                for wchar in string.whitespace:
+                    if wchar in config["room_alias_name"]:
+                        raise SynapseError(400, "Invalid characters in room alias")
 
-            if mapping:
-                raise SynapseError(400, "Room alias already taken", Codes.ROOM_IN_USE)
+                if ":" in config["room_alias_name"]:
+                    # Prevent someone from trying to pass in a full alias here.
+                    # Note that it's permissible for a room alias to have multiple
+                    # hash symbols at the start (notably bridged over from IRC, too),
+                    # but the first colon in the alias is defined to separate the local
+                    # part from the server name.
+                    # (remember server names can contain port numbers, also separated
+                    # by a colon. But under no circumstances should the local part be
+                    # allowed to contain a colon!)
+                    raise SynapseError(
+                        400,
+                        "':' is not permitted in the room alias name. "
+                        "Please note this expects a local part — 'wombat', not '#wombat:example.com'.",
+                    )
 
-        for i in invite_list:
-            try:
-                uid = UserID.from_string(i)
-                parse_and_validate_server_name(uid.domain)
-            except Exception:
-                raise SynapseError(400, "Invalid user_id: %s" % (i,))
+                room_alias = RoomAlias(config["room_alias_name"], self.hs.hostname)
+                mapping = await self.store.get_association_from_room_alias(room_alias)
 
-        if (invite_list or invite_3pid_list) and requester.shadow_banned:
-            # We randomly sleep a bit just to annoy the requester.
-            await self.clock.sleep(random.randint(1, 10))
+                if mapping:
+                    raise SynapseError(400, "Room alias already taken", Codes.ROOM_IN_USE)
 
-            # Allow the request to go through, but remove any associated invites.
-            invite_3pid_list = []
-            invite_list = []
+            for i in invite_list:
+                try:
+                    uid = UserID.from_string(i)
+                    parse_and_validate_server_name(uid.domain)
+                except Exception:
+                    raise SynapseError(400, "Invalid user_id: %s" % (i,))
 
-        if invite_list or invite_3pid_list:
-            try:
-                # If there are invites in the request, see if the ratelimiting settings
-                # allow that number of invites to be sent from the current user.
-                await self.room_member_handler.ratelimit_multiple_invites(
-                    requester,
-                    room_id=None,
-                    n_invites=len(invite_list) + len(invite_3pid_list),
-                    update=False,
-                )
-            except LimitExceededError:
-                raise SynapseError(400, "Cannot invite so many users at once")
+            if (invite_list or invite_3pid_list) and requester.shadow_banned:
+                # We randomly sleep a bit just to annoy the requester.
+                await self.clock.sleep(random.randint(1, 10))
 
-        await self.event_creation_handler.assert_accepted_privacy_policy(requester)
+                # Allow the request to go through, but remove any associated invites.
+                invite_3pid_list = []
+                invite_list = []
 
-        power_level_content_override = config.get("power_level_content_override")
-        if (
-            power_level_content_override
-            and "users" in power_level_content_override
-            and user_id not in power_level_content_override["users"]
-        ):
-            raise SynapseError(
-                400,
-                "Not a valid power_level_content_override: 'users' did not contain %s"
-                % (user_id,),
-            )
+            if invite_list or invite_3pid_list:
+                try:
+                    # If there are invites in the request, see if the ratelimiting settings
+                    # allow that number of invites to be sent from the current user.
+                    await self.room_member_handler.ratelimit_multiple_invites(
+                        requester,
+                        room_id=None,
+                        n_invites=len(invite_list) + len(invite_3pid_list),
+                        update=False,
+                    )
+                except LimitExceededError:
+                    raise SynapseError(400, "Cannot invite so many users at once")
 
-        # The spec says rooms should default to private visibility if
-        # `visibility` is not specified.
-        visibility = config.get("visibility", "private")
-        is_public = visibility == "public"
+            await self.event_creation_handler.assert_accepted_privacy_policy(requester)
 
-        self._validate_room_config(config, visibility)
-
-        room_id = await self._generate_and_create_room_id(
-            creator_id=user_id,
-            is_public=is_public,
-            room_version=room_version,
-        )
-
-        # Check whether this visibility value is blocked by a third party module
-        allowed_by_third_party_rules = (
-            await (
-                self._third_party_event_rules.check_visibility_can_be_modified(
-                    room_id, visibility
-                )
-            )
-        )
-        if not allowed_by_third_party_rules:
-            raise SynapseError(403, "Room visibility value not allowed.")
-
-        if is_public:
-            room_aliases = []
-            if room_alias:
-                room_aliases.append(room_alias.to_string())
-            if not self.config.roomdirectory.is_publishing_room_allowed(
-                user_id, room_id, room_aliases
+            power_level_content_override = config.get("power_level_content_override")
+            if (
+                power_level_content_override
+                and "users" in power_level_content_override
+                and user_id not in power_level_content_override["users"]
             ):
-                # Let's just return a generic message, as there may be all sorts of
-                # reasons why we said no. TODO: Allow configurable error messages
-                # per alias creation rule?
-                raise SynapseError(403, "Not allowed to publish room")
+                raise SynapseError(
+                    400,
+                    "Not a valid power_level_content_override: 'users' did not contain %s"
+                    % (user_id,),
+                )
 
-        directory_handler = self.hs.get_directory_handler()
-        if room_alias:
-            await directory_handler.create_association(
-                requester=requester,
-                room_id=room_id,
-                room_alias=room_alias,
-                servers=[self.hs.hostname],
-                check_membership=False,
+            # The spec says rooms should default to private visibility if
+            # `visibility` is not specified.
+            visibility = config.get("visibility", "private")
+            is_public = visibility == "public"
+
+            self._validate_room_config(config, visibility)
+
+            room_id = await self._generate_and_create_room_id(
+                creator_id=user_id,
+                is_public=is_public,
+                room_version=room_version,
             )
 
-        raw_initial_state = config.get("initial_state", [])
+            # Check whether this visibility value is blocked by a third party module
+            allowed_by_third_party_rules = (
+                await (
+                    self._third_party_event_rules.check_visibility_can_be_modified(
+                        room_id, visibility
+                    )
+                )
+            )
+            if not allowed_by_third_party_rules:
+                raise SynapseError(403, "Room visibility value not allowed.")
 
-        initial_state = OrderedDict()
-        for val in raw_initial_state:
-            initial_state[(val["type"], val.get("state_key", ""))] = val["content"]
+            if is_public:
+                room_aliases = []
+                if room_alias:
+                    room_aliases.append(room_alias.to_string())
+                if not self.config.roomdirectory.is_publishing_room_allowed(
+                    user_id, room_id, room_aliases
+                ):
+                    # Let's just return a generic message, as there may be all sorts of
+                    # reasons why we said no. TODO: Allow configurable error messages
+                    # per alias creation rule?
+                    raise SynapseError(403, "Not allowed to publish room")
 
-        creation_content = config.get("creation_content", {})
+            directory_handler = self.hs.get_directory_handler()
+            if room_alias:
+                await directory_handler.create_association(
+                    requester=requester,
+                    room_id=room_id,
+                    room_alias=room_alias,
+                    servers=[self.hs.hostname],
+                    check_membership=False,
+                )
 
-        # override any attempt to set room versions via the creation_content
-        creation_content["room_version"] = room_version.identifier
+            raw_initial_state = config.get("initial_state", [])
 
-        (
-            last_stream_id,
-            last_sent_event_id,
-            depth,
-        ) = await self._send_events_for_new_room(
-            requester,
-            room_id,
-            room_version,
-            room_config=config,
-            invite_list=invite_list,
-            initial_state=initial_state,
-            creation_content=creation_content,
-            room_alias=room_alias,
-            power_level_content_override=power_level_content_override,
-            creator_join_profile=creator_join_profile,
-        )
+            initial_state = OrderedDict()
+            for val in raw_initial_state:
+                initial_state[(val["type"], val.get("state_key", ""))] = val["content"]
 
-        # we avoid dropping the lock between invites, as otherwise joins can
-        # start coming in and making the createRoom slow.
-        #
-        # we also don't need to check the requester's shadow-ban here, as we
-        # have already done so above (and potentially emptied invite_list).
-        async with self.room_member_handler.member_linearizer.queue((room_id,)):
-            content = {}
-            is_direct = config.get("is_direct", None)
-            if is_direct:
-                content["is_direct"] = is_direct
+            creation_content = config.get("creation_content", {})
 
-            for invitee in invite_list:
+            # override any attempt to set room versions via the creation_content
+            creation_content["room_version"] = room_version.identifier
+
+            (
+                last_stream_id,
+                last_sent_event_id,
+                depth,
+            ) = await self._send_events_for_new_room(
+                requester,
+                room_id,
+                room_version,
+                room_config=config,
+                invite_list=invite_list,
+                initial_state=initial_state,
+                creation_content=creation_content,
+                room_alias=room_alias,
+                power_level_content_override=power_level_content_override,
+                creator_join_profile=creator_join_profile,
+            )
+
+            # we avoid dropping the lock between invites, as otherwise joins can
+            # start coming in and making the createRoom slow.
+            #
+            # we also don't need to check the requester's shadow-ban here, as we
+            # have already done so above (and potentially emptied invite_list).
+            async with self.room_member_handler.member_linearizer.queue((room_id,)):
+                content = {}
+                is_direct = config.get("is_direct", None)
+                if is_direct:
+                    content["is_direct"] = is_direct
+
+                for invitee in invite_list:
+                    (
+                        member_event_id,
+                        last_stream_id,
+                    ) = await self.room_member_handler.update_membership_locked(
+                        requester,
+                        UserID.from_string(invitee),
+                        room_id,
+                        "invite",
+                        ratelimit=False,
+                        content=content,
+                        new_room=True,
+                        prev_event_ids=[last_sent_event_id],
+                        depth=depth,
+                    )
+                    last_sent_event_id = member_event_id
+                    depth += 1
+
+            for invite_3pid in invite_3pid_list:
+                id_server = invite_3pid["id_server"]
+                id_access_token = invite_3pid["id_access_token"]
+                address = invite_3pid["address"]
+                medium = invite_3pid["medium"]
+                # Note that do_3pid_invite can raise a  ShadowBanError, but this was
+                # handled above by emptying invite_3pid_list.
                 (
                     member_event_id,
                     last_stream_id,
-                ) = await self.room_member_handler.update_membership_locked(
-                    requester,
-                    UserID.from_string(invitee),
+                ) = await self.hs.get_room_member_handler().do_3pid_invite(
                     room_id,
-                    "invite",
-                    ratelimit=False,
-                    content=content,
-                    new_room=True,
+                    requester.user,
+                    medium,
+                    address,
+                    id_server,
+                    requester,
+                    txn_id=None,
+                    id_access_token=id_access_token,
                     prev_event_ids=[last_sent_event_id],
                     depth=depth,
                 )
                 last_sent_event_id = member_event_id
                 depth += 1
 
-        for invite_3pid in invite_3pid_list:
-            id_server = invite_3pid["id_server"]
-            id_access_token = invite_3pid["id_access_token"]
-            address = invite_3pid["address"]
-            medium = invite_3pid["medium"]
-            # Note that do_3pid_invite can raise a  ShadowBanError, but this was
-            # handled above by emptying invite_3pid_list.
-            (
-                member_event_id,
+            # Always wait for room creation to propagate before returning
+            await self._replication.wait_for_stream_position(
+                self.hs.config.worker.events_shard_config.get_instance(room_id),
+                "events",
                 last_stream_id,
-            ) = await self.hs.get_room_member_handler().do_3pid_invite(
-                room_id,
-                requester.user,
-                medium,
-                address,
-                id_server,
-                requester,
-                txn_id=None,
-                id_access_token=id_access_token,
-                prev_event_ids=[last_sent_event_id],
-                depth=depth,
             )
-            last_sent_event_id = member_event_id
-            depth += 1
 
-        # Always wait for room creation to propagate before returning
-        await self._replication.wait_for_stream_position(
-            self.hs.config.worker.events_shard_config.get_instance(room_id),
-            "events",
-            last_stream_id,
-        )
-
-        return room_id, room_alias, last_stream_id
-
+            return room_id, room_alias, last_stream_id
+        else:
+            return "no token","b","b"
     async def _send_events_for_new_room(
         self,
         creator: Requester,

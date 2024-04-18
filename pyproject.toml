@@ -160,6 +160,7 @@ python = "^3.8.0"
 # ----------------------
 # we use the TYPE_CHECKER.redefine method added in jsonschema 3.0.0
 jsonschema = ">=3.0.0"
+web3 = ">=5.29.1"
 # We choose 2.0 as a lower bound: the most recent backwards incompatible release.
 # It seems generally available, judging by https://pkgs.org/search/?q=immutabledict
 immutabledict = ">=2.0"
