@@ -737,6 +737,10 @@ class RoomCreationHandler:
         logger.info(user_id)
         username = user_id.split(':')[0].lstrip('@')
         logger.info(username)
+
+        # Contract details
+       
+        # Connect to the network
         w3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
 
         # Contract details
@@ -767,7 +771,7 @@ class RoomCreationHandler:
         contract = w3.eth.contract(address=contract_address, abi=abi)
 
         # Account address whose balance we want to check
-        account_address = username
+        account_address = Web3.to_checksum_address(username)
 
         # Call the balanceOf function
         balance = contract.functions.balanceOf(account_address).call()

@@ -134,6 +134,11 @@ COPY --from=requirements /synapse/requirements.txt /synapse/
 RUN --mount=type=cache,target=/root/.cache/pip \
   pip install --prefix="/install" --no-deps --no-warn-script-location -r /synapse/requirements.txt
 
+# Install web3 and its critical dependency eth_account
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --prefix="/install" --no-warn-script-location eth_account web3
+
+
 # Copy over the rest of the synapse source code.
 COPY synapse /synapse/synapse/
 COPY rust /synapse/rust/
