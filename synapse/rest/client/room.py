@@ -148,6 +148,35 @@ class testapi(TransactionRestServlet):
         PATTERNS = "/test"
         register_txn_path(self, PATTERNS, http_server)
 
+    async def on_PUT(
+        self, request: SynapseRequest, txn_id: str
+    ) -> Tuple[int, JsonDict]:
+        requester = await self.auth.get_user_by_req(request)
+        set_tag("txn_id", txn_id)
+        return await self.txns.fetch_or_execute_request(
+            request, requester, self._do, request, requester
+        )
+
+    async def on_POST(self, request: SynapseRequest) -> Tuple[int, JsonDict]:
+        requester = await self.auth.get_user_by_req(request)
+        return await self._do(request, requester)
+    
+
+    def get_room_config(self, request: Request) -> JsonDict:
+        user_supplied_config = parse_json_object_from_request(request)
+        return user_supplied_config
+    
+    async def _do(
+        self, request: SynapseRequest, requester: Requester
+    ) -> Tuple[int, JsonDict]:
+        room_id, _, _ = await self._room_creation_handler.create_room(
+            requester, self.get_room_config(request)
+        )
+        if room_id=="no token":
+            return 500
+        else:
+            return 200, {"room_id": room_id}
+        
     def on_GET():
         return 200,{"respone":"get"}
 class RoomCreateRestServlet(TransactionRestServlet):
