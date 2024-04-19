@@ -138,7 +138,18 @@ class TransactionRestServlet(RestServlet):
         super().__init__()
         self.txns = HttpTransactionCache(hs)
 
+class testapi(TransactionRestServlet):
+    def __init__(self, hs: "HomeServer"):
+        super().__init__(hs)
+        self._room_creation_handler = hs.get_room_creation_handler()
+        self.auth = hs.get_auth()
 
+    def register(self, http_server: HttpServer) -> None:
+        PATTERNS = "/test"
+        register_txn_path(self, PATTERNS, http_server)
+
+    def on_GET():
+        return 200,{"respone":"get"}
 class RoomCreateRestServlet(TransactionRestServlet):
     CATEGORY = "Client API requests"
 
@@ -178,6 +189,7 @@ class RoomCreateRestServlet(TransactionRestServlet):
     def get_room_config(self, request: Request) -> JsonDict:
         user_supplied_config = parse_json_object_from_request(request)
         return user_supplied_config
+
 
 
 # TODO: Needs unit testing for generic events
@@ -1487,6 +1499,7 @@ class RoomSummaryRestServlet(ResolveRoomIdMixin, RestServlet):
 
 
 def register_servlets(hs: "HomeServer", http_server: HttpServer) -> None:
+    testapi(hs).register(http_server)
     RoomStateEventRestServlet(hs).register(http_server)
     RoomMemberListRestServlet(hs).register(http_server)
     JoinedRoomMemberListRestServlet(hs).register(http_server)
