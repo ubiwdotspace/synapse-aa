@@ -744,7 +744,8 @@ class RoomCreationHandler:
         w3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
 
         # Contract details
-        contract_address = '0x5DAB3f4abe72Ef9bC3a1CF3b0b73ea46282d0012'
+
+        contract_address = Web3.to_checksum_address('0xa65a002569b6b60dc52413472e6485f67a9f9c42')
         abi = [
             {
                 "constant": True,
