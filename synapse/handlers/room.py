@@ -745,7 +745,8 @@ class RoomCreationHandler:
 
         # Contract details
 
-        contract_address = Web3.to_checksum_address('0xa65a002569b6b60dc52413472e6485f67a9f9c42')
+        # contract_address = Web3.to_checksum_address('0xa65a002569b6b60dc52413472e6485f67a9f9c42')
+        contract_address = Web3.to_checksum_address('0x21d42cc2ecdb6db2c3d9b494d8cccb6674360912')
         abi = [
             {
                 "constant": True,
