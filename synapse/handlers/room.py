@@ -19,6 +19,8 @@ import math
 import random
 import string
 from web3 import Web3
+import json
+import requests
 from collections import OrderedDict
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, List, Optional, Tuple
@@ -732,52 +734,118 @@ class RoomCreationHandler:
                 if server is blocked to some resource being
                 exceeded
         """
+        space_owner = "0x0000000000000000000000000000000000000000"
+        smart_account_address="0x"
         user_id = requester.user.to_string()
-        logger.info("heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-        logger.info(user_id)
         username = user_id.split(':')[0].lstrip('@')
-        logger.info(username)
-
-        # Contract details
-       
-        # Connect to the network
-        w3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
-
-        # Contract details
-
-        # contract_address = Web3.to_checksum_address('0xa65a002569b6b60dc52413472e6485f67a9f9c42')
-        contract_address = Web3.to_checksum_address('0x21d42cc2ecdb6db2c3d9b494d8cccb6674360912')
-        abi = [
-            {
-                "constant": True,
-                "inputs": [
+        try:
+            url = "https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount"
+            user_id = requester.user.to_string()
+            IDuser = Web3.to_checksum_address(username)
+            logger.info("heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            logger.info(IDuser)
+            payload = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "chainId": 11155111,
+                "method": "particle_aa_getSmartAccount",
+                "params": [
                     {
-                        "name": "owner",
-                        "type": "address"
+                    "name": "SIMPLE",
+                    "version": "1.0.0",
+                    "ownerAddress": IDuser
                     }
-                ],
-                "name": "balanceOf",
-                "outputs": [
-                    {
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "payable": False,
-                "stateMutability": "view",
-                "type": "function"
+                ]
             }
-        ]
+            headers = {
+                "accept": "application/json",
+                "content-type": "application/json",
+                "authorization": "Basic YzFiOTM3MjItY2RhYi00ZjUwLWIwM2UtOGE5OTdlZmIzYTJlOmNyUVk2SFVLSTAwRlBpNHV2c0ZZMjVwcXhtMGMzOTBIdWY5aDFWZDI="
+            }
 
-        # Setup the contract
-        contract = w3.eth.contract(address=contract_address, abi=abi)
+            response = requests.post(url, json=payload, headers=headers)
 
-        # Account address whose balance we want to check
-        account_address = Web3.to_checksum_address(username)
+            print(response.text)
+            data = json.loads(response.text)
+            smart_account_address = data["result"][0]["smartAccountAddress"]
+            
+            logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            logger.info(smart_account_address)
+        
 
-        # Call the balanceOf function
-        balance = contract.functions.balanceOf(account_address).call()
-        if(balance > 0):
+            # Contract details
+        
+            # Connect to the network
+            web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
+
+            # # Contract details
+
+            # # contract_address = Web3.to_checksum_address('0xa65a002569b6b60dc52413472e6485f67a9f9c42')
+            # contract_address = Web3.to_checksum_address('0x21d42cc2ecdb6db2c3d9b494d8cccb6674360912')
+            # abi = [
+            #     {
+            #         "constant": True,
+            #         "inputs": [
+            #             {
+            #                 "name": "owner",
+            #                 "type": "address"
+            #             }
+            #         ],
+            #         "name": "balanceOf",
+            #         "outputs": [
+            #             {
+            #                 "name": "",
+            #                 "type": "uint256"
+            #             }
+            #         ],
+            #         "payable": False,
+            #         "stateMutability": "view",
+            #         "type": "function"
+            #     }
+            # ]
+
+            # # Setup the contract
+            # contract = w3.eth.contract(address=contract_address, abi=abi)
+
+            # # Account address whose balance we want to check
+            # account_address = Web3.to_checksum_address(smart_account_address)
+
+            # # Call the balanceOf function
+            # balance = contract.functions.balanceOf(account_address).call()
+            space_owner = "0x0000000000000000000000000000000000000000"
+        
+            contract_address = "0xA428A805310A82BD8cf060725882128C4Bb602A1"
+            abi = [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "spaces",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "spaceOwner",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ]       
+
+            
+            contract = web3.eth.contract(address=contract_address, abi=abi)
+
+    
+            account_address = Web3.to_checksum_address(smart_account_address)
+            space_owner = contract.functions.spaces(account_address).call()
+        except Exception as e:
+            logger.info("errorrr contract")
+        if(space_owner != "0x0000000000000000000000000000000000000000"):
             await self.auth_blocking.check_auth_blocking(requester=requester)
 
             if (

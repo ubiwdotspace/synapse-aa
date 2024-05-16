@@ -138,7 +138,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --prefix="/install" --no-warn-script-location eth_account web3
 
-
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --prefix="/install" --no-warn-script-location requests
 # Copy over the rest of the synapse source code.
 COPY synapse /synapse/synapse/
 COPY rust /synapse/rust/
