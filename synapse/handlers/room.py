@@ -1505,7 +1505,7 @@ class RoomCreationHandler:
         attempts = 0
         while attempts < 5:
             try:
-                 gen_room_id = self._generate_room_id()
+                gen_room_id = self._generate_room_id()
                 # await self.store.store_room(
                 #     room_id=gen_room_id,
                 #     room_creator_user_id=creator_id,
