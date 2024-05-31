@@ -738,36 +738,33 @@ class RoomCreationHandler:
         logger.info(config["room_id"])
         RID = str(config["room_id"])
         space_owner = "0x0000000000000000000000000000000000000000"
+        web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
+
         smart_account_address="0x"
         user_id = requester.user.to_string()    
         username = user_id.split(':')[0].lstrip('@')
         try:
-            url = "https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount"
-            IDuser = Web3.to_checksum_address(username)
+            url = "https://rpc.particle.network/evm-chain?chainId=11155111&projectUuid=70cca4db-cd66-41fb-9fad-477802236ae7&projectKey=c7rCaFkQbbbzMVQLFLjQ6fUIyjn7Ltri6rQ4ryqx"
+            signer = web3.to_checksum_address(username)
             payload = {
                 "jsonrpc": "2.0",
-                "id": 1,
-                "chainId": 11155111,
                 "method": "particle_aa_getSmartAccount",
                 "params": [
-                    {
-                    "name": "SIMPLE",
-                    "version": "1.0.0",
-                    "ownerAddress": IDuser
-                    }
-                ]
+                        {
+                            "name": "SIMPLE",
+                            "version": "1.0.0",
+                            "ownerAddress": signer
+                            }
+                        ]
             }
             headers = {
-                "accept": "application/json",
-                "content-type": "application/json",
-                "authorization": "Basic YzFiOTM3MjItY2RhYi00ZjUwLWIwM2UtOGE5OTdlZmIzYTJlOmNyUVk2SFVLSTAwRlBpNHV2c0ZZMjVwcXhtMGMzOTBIdWY5aDFWZDI="
+                        "accept": "application/json",
+                        "content-type": "application/json",
             }
-
-            response = requests.post(url, json=payload, headers=headers)
-
-            
+            response = requests.post(url, json=payload, headers=headers)   
             data = json.loads(response.text)
             smart_account_address = data["result"][0]["smartAccountAddress"]
+
             
             logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             logger.info(smart_account_address)
@@ -776,7 +773,6 @@ class RoomCreationHandler:
             # Contract details
         
             # Connect to the network
-            web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
 
             # # Contract details
 
