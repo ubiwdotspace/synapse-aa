@@ -734,11 +734,11 @@ class RoomCreationHandler:
                 if server is blocked to some resource being
                 exceeded
         """
-        logger.info("heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-        logger.info(config)
+        logger.info("123214241241heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+        logger.info(config.room_id)
         space_owner = "0x0000000000000000000000000000000000000000"
         smart_account_address="0x"
-        user_id = requester.user.to_string()
+        user_id = requester.user.to_string()    
         username = user_id.split(':')[0].lstrip('@')
         try:
             url = "https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount"
