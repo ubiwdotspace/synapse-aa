@@ -1514,7 +1514,7 @@ class RoomCreationHandler:
                 # )
                 num1 = random.randint(1, 10)
                 num = str("!")
-                num = num +str(num1) +str(":127.0.0.1")
+                num = num +str(num1) +str(":ubiw.space")
                 logger.info(num)
                 await self.store.store_room(
                     room_id=num,
