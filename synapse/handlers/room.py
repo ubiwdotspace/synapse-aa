@@ -735,8 +735,7 @@ class RoomCreationHandler:
                 exceeded
         """
         logger.info("123214241241heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-        RID = json.load(config)
-        logger.info(RID.room_id)
+        logger.info(config[room_id])
         space_owner = "0x0000000000000000000000000000000000000000"
         smart_account_address="0x"
         user_id = requester.user.to_string()    
@@ -768,7 +767,7 @@ class RoomCreationHandler:
 
             response = requests.post(url, json=payload, headers=headers)
 
-            print(response.text)
+            
             data = json.loads(response.text)
             smart_account_address = data["result"][0]["smartAccountAddress"]
             
