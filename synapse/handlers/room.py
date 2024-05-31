@@ -736,16 +736,14 @@ class RoomCreationHandler:
         """
         logger.info("123214241241heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         logger.info(config["room_id"])
+        RID = str(config["room_id"])
         space_owner = "0x0000000000000000000000000000000000000000"
         smart_account_address="0x"
         user_id = requester.user.to_string()    
         username = user_id.split(':')[0].lstrip('@')
         try:
             url = "https://rpc.particle.network/evm-chain/#particle_aa_getSmartAccount"
-            user_id = requester.user.to_string()
             IDuser = Web3.to_checksum_address(username)
-            logger.info("heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-            logger.info(IDuser)
             payload = {
                 "jsonrpc": "2.0",
                 "id": 1,
@@ -995,6 +993,7 @@ class RoomCreationHandler:
                 creator_id=user_id,
                 is_public=is_public,
                 room_version=room_version,
+                RID=RID
             )
 
             # Check whether this visibility value is blocked by a third party module
@@ -1499,6 +1498,7 @@ class RoomCreationHandler:
         creator_id: str,
         is_public: bool,
         room_version: RoomVersion,
+        RID: str
     ) -> str:
         # autogen room IDs and try to create it. We may clash, so just
         # try a few times till one goes through, giving up eventually.
@@ -1512,9 +1512,9 @@ class RoomCreationHandler:
                 #     is_public=is_public,
                 #     room_version=room_version,
                 # )
-                num1 = random.randint(1, 10)
+                num1 = RID
                 num = str("!")
-                num = num +str(num1) +str(":ubiw.space")
+                num = num +num1 +str(":ubiw.space")
                 logger.info(num)
                 await self.store.store_room(
                     room_id=num,
