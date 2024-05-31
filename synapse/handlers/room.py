@@ -734,6 +734,8 @@ class RoomCreationHandler:
                 if server is blocked to some resource being
                 exceeded
         """
+        logger.info("heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+        logger.info(config.room_id)
         space_owner = "0x0000000000000000000000000000000000000000"
         smart_account_address="0x"
         user_id = requester.user.to_string()
@@ -1503,14 +1505,25 @@ class RoomCreationHandler:
         attempts = 0
         while attempts < 5:
             try:
-                gen_room_id = self._generate_room_id()
+                 gen_room_id = self._generate_room_id()
+                # await self.store.store_room(
+                #     room_id=gen_room_id,
+                #     room_creator_user_id=creator_id,
+                #     is_public=is_public,
+                #     room_version=room_version,
+                # )
+                num1 = random.randint(1, 10)
+                num = str("!")
+                num = num +str(num1) +str(":127.0.0.1")
+                logger.info(num)
                 await self.store.store_room(
-                    room_id=gen_room_id,
+                    room_id=num,
                     room_creator_user_id=creator_id,
                     is_public=is_public,
                     room_version=room_version,
                 )
-                return gen_room_id
+                # return gen_room_id
+                return num
             except StoreError:
                 attempts += 1
         raise StoreError(500, "Couldn't generate a room ID.")
