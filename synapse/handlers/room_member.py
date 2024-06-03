@@ -17,7 +17,7 @@ import logging
 import random
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Iterable, List, Optional, Set, Tuple
-
+import psycopg2
 from synapse import types
 from synapse.api.constants import (
     AccountDataTypes,
@@ -607,8 +607,32 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
         logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         logger.info(requester)
         logger.info(target)
-        logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+        logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+        conn = psycopg2.connect(
+        dbname="matrix_synapse",
+        user="matrix_synapse_rw",
+        password="m@trix!",
+        host="postgres",  # Sử dụng tên dịch vụ Docker
+        port="5432"
+        )
 
+        cur = conn.cursor()
+
+
+
+
+        room_id_temp = room_id
+
+        cur.execute("""
+            SELECT creator
+            FROM rooms
+            WHERE room_id = %s
+        """, (room_id_temp,))
+
+        creator = cur.fetchone()
+        logger.info(creator[0])
+        cur.close()
+        conn.close()
         if ratelimit:
             if action == Membership.JOIN:
                 # Only rate-limit if the user isn't already joined to the room, otherwise

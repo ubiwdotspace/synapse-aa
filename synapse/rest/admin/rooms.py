@@ -218,43 +218,9 @@ class ListRoomRestServlet(RestServlet):
         self.admin_handler = hs.get_admin_handler()
 
     async def on_GET(self, request: SynapseRequest) -> Tuple[int, JsonDict]:
-        # await assert_requester_is_admin(self.auth, request)
-
-        conn = psycopg2.connect(
-        dbname="matrix_synapse",
-        user="matrix_synapse_rw",
-        password="m@trix!",
-        host="postgres",  # Sử dụng tên dịch vụ Docker
-        port="5432"
-        )
-
-        cur = conn.cursor()
+        await assert_requester_is_admin(self.auth, request)
 
 
-
-
-        # Lấy kết quả và in ra
-        logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
-        
-        
-        # Tạo cursor
-
-        # ID của phòng bạn muốn truy vấn
-        room_id = "!etgwUNfbPlphSkkVGC:ubiw.space"
-
-        # Thực hiện truy vấn SQL để lấy thông tin về người tạo của phòng
-        cur.execute("""
-            SELECT creator
-            FROM rooms
-            WHERE room_id = %s
-        """, (room_id,))
-
-        # Lấy kết quả
-        creator = cur.fetchone()
-        logger.info(creator[0])
-        # Đóng cursor và kết nối
-        cur.close()
-        conn.close()
         # Extract query parameters
         start = parse_integer(request, "from", default=0)
         limit = parse_integer(request, "limit", default=100)
