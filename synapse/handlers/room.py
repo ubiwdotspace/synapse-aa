@@ -810,7 +810,7 @@ class RoomCreationHandler:
             # balance = contract.functions.balanceOf(account_address).call()
             space_owner = "0x0000000000000000000000000000000000000000"
         
-            contract_address = "0xA428A805310A82BD8cf060725882128C4Bb602A1"
+            contract_address = "0x776cFb4026a3cA7E1e4524E416d86a1F80D6c57D"
             abi = [
                 {
                     "inputs": [
