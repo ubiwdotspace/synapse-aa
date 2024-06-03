@@ -229,8 +229,7 @@ class ListRoomRestServlet(RestServlet):
         )
 
 
-        # Tạo con trỏ để thực hiện truy vấn
-        cur = conn.cursor()
+
 
         # Thực hiện truy vấn để lấy danh sách các bảng
         cur.execute("""
@@ -240,15 +239,22 @@ class ListRoomRestServlet(RestServlet):
         """)
 
         # Lấy kết quả và in ra
-        tables = cur.fetchall()
         logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
-        for table in tables:
-            logger.info(table[0])
-
-        # Đóng con trỏ và kết nối
+        cur = conn.cursor()
+        
+        # Thực hiện truy vấn SQL
+        cur.execute("SELECT * FROM rooms")
+        
+        # Lấy tất cả bản ghi
+        rows = cur.fetchall()
+        
+        # In ra kết quả
+        for row in rows:
+            logger.info(row)
+        
+        # Đóng cursor và kết nối
         cur.close()
         conn.close()
-
         # Extract query parameters
         start = parse_integer(request, "from", default=0)
         limit = parse_integer(request, "limit", default=100)
