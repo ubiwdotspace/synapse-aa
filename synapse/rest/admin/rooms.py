@@ -231,27 +231,27 @@ class ListRoomRestServlet(RestServlet):
         cur = conn.cursor()
 
 
-        # Thực hiện truy vấn để lấy danh sách các bảng
-        cur.execute("""
-            SELECT table_name
-            FROM information_schema.tables
-            WHERE table_schema = 'public'
-        """)
+
 
         # Lấy kết quả và in ra
         logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
         
         
-        # Thực hiện truy vấn SQL
-        cur.execute("SELECT * FROM rooms")
-        
-        # Lấy tất cả bản ghi
-        rows = cur.fetchall()
-        
-        # In ra kết quả
-        for row in rows:
-            logger.info(row)
-        
+        # Tạo cursor
+
+        # ID của phòng bạn muốn truy vấn
+        room_id = "!etgwUNfbPlphSkkVGC:ubiw.space"
+
+        # Thực hiện truy vấn SQL để lấy thông tin về người tạo của phòng
+        cur.execute("""
+            SELECT creator
+            FROM rooms
+            WHERE room_id = %s
+        """, (room_id,))
+
+        # Lấy kết quả
+        creator = cur.fetchone()
+        logger.info(creator[0])
         # Đóng cursor và kết nối
         cur.close()
         conn.close()
