@@ -221,12 +221,13 @@ class ListRoomRestServlet(RestServlet):
         # await assert_requester_is_admin(self.auth, request)
 
         conn = psycopg2.connect(
-            dbname="matrix_synapse",
-            user="matrix_synapse_rw",
-            password="m@trix!",
-            host="localhost",  # Nếu Docker đang chạy trên cùng một máy
-            port="5432"        # Cổng mặc định của PostgreSQL
+        dbname="matrix_synapse",
+        user="matrix_synapse_rw",
+        password="m@trix!",
+        host="postgres",  # Sử dụng tên dịch vụ Docker
+        port="5432"
         )
+
 
         # Tạo con trỏ để thực hiện truy vấn
         cur = conn.cursor()
