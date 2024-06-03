@@ -228,7 +228,7 @@ class ListRoomRestServlet(RestServlet):
         port="5432"
         )
 
-
+        cur = conn.cursor()
 
 
         # Thực hiện truy vấn để lấy danh sách các bảng
@@ -240,7 +240,7 @@ class ListRoomRestServlet(RestServlet):
 
         # Lấy kết quả và in ra
         logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
-        cur = conn.cursor()
+        
         
         # Thực hiện truy vấn SQL
         cur.execute("SELECT * FROM rooms")
