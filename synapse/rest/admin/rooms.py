@@ -17,6 +17,8 @@ from typing import TYPE_CHECKING, List, Optional, Tuple, cast
 from urllib import parse as urlparse
 
 import attr
+import psycopg2
+
 
 from synapse.api.constants import Direction, EventTypes, JoinRules, Membership
 from synapse.api.errors import AuthError, Codes, NotFoundError, SynapseError
@@ -217,6 +219,34 @@ class ListRoomRestServlet(RestServlet):
 
     async def on_GET(self, request: SynapseRequest) -> Tuple[int, JsonDict]:
         await assert_requester_is_admin(self.auth, request)
+
+        conn = psycopg2.connect(
+            dbname="matrix_synapse",
+            user="matrix_synapse_rw",
+            password="m@trix!",
+            host="localhost",  # Nếu Docker đang chạy trên cùng một máy
+            port="5432"        # Cổng mặc định của PostgreSQL
+        )
+
+        # Tạo con trỏ để thực hiện truy vấn
+        cur = conn.cursor()
+
+        # Thực hiện truy vấn để lấy danh sách các bảng
+        cur.execute("""
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+        """)
+
+        # Lấy kết quả và in ra
+        tables = cur.fetchall()
+        logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+        for table in tables:
+            logger.info(table[0])
+
+        # Đóng con trỏ và kết nối
+        cur.close()
+        conn.close()
 
         # Extract query parameters
         start = parse_integer(request, "from", default=0)

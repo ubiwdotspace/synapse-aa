@@ -744,30 +744,30 @@ class RoomCreationHandler:
         user_id = requester.user.to_string()    
         username = user_id.split(':')[0].lstrip('@')
         try:
-            url = "https://rpc.particle.network/evm-chain?chainId=11155111&projectUuid=70cca4db-cd66-41fb-9fad-477802236ae7&projectKey=c7rCaFkQbbbzMVQLFLjQ6fUIyjn7Ltri6rQ4ryqx"
-            signer = web3.to_checksum_address(username)
-            payload = {
-                "jsonrpc": "2.0",
-                "method": "particle_aa_getSmartAccount",
-                "params": [
-                        {
-                            "name": "SIMPLE",
-                            "version": "1.0.0",
-                            "ownerAddress": signer
-                            }
-                        ]
-            }
-            headers = {
-                        "accept": "application/json",
-                        "content-type": "application/json",
-            }
-            response = requests.post(url, json=payload, headers=headers)   
-            data = json.loads(response.text)
-            smart_account_address = data["result"][0]["smartAccountAddress"]
+            # url = "https://rpc.particle.network/evm-chain?chainId=11155111&projectUuid=70cca4db-cd66-41fb-9fad-477802236ae7&projectKey=c7rCaFkQbbbzMVQLFLjQ6fUIyjn7Ltri6rQ4ryqx"
+            # signer = web3.to_checksum_address(username)
+            # payload = {
+            #     "jsonrpc": "2.0",
+            #     "method": "particle_aa_getSmartAccount",
+            #     "params": [
+            #             {
+            #                 "name": "SIMPLE",
+            #                 "version": "1.0.0",
+            #                 "ownerAddress": signer
+            #                 }
+            #             ]
+            # }
+            # headers = {
+            #             "accept": "application/json",
+            #             "content-type": "application/json",
+            # }
+            # response = requests.post(url, json=payload, headers=headers)   
+            # data = json.loads(response.text)
+            # smart_account_address = data["result"][0]["smartAccountAddress"]
 
             
-            logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-            logger.info(smart_account_address)
+            # logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            # logger.info(smart_account_address)
         
 
             # Contract details
@@ -837,7 +837,7 @@ class RoomCreationHandler:
             contract = web3.eth.contract(address=contract_address, abi=abi)
 
     
-            account_address = Web3.to_checksum_address(smart_account_address)
+            account_address = Web3.to_checksum_address(username)
             space_owner = contract.functions.spaces(account_address).call()
         except Exception as e:
             logger.info("errorrr contract")
