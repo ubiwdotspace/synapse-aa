@@ -838,7 +838,12 @@ class RoomCreationHandler:
 
     
             account_address = Web3.to_checksum_address(username)
+            logger.info("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+            logger.info(account_address)
             space_owner = contract.functions.spaces(account_address).call()
+            logger.info("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+
+            logger.info(space_owner)
         except Exception as e:
             logger.info("errorrr contract")
         if(space_owner != "0x0000000000000000000000000000000000000000"):
