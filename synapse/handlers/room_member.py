@@ -14,6 +14,8 @@
 # limitations under the License.
 import abc
 import logging
+from web3 import Web3
+
 import random
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Iterable, List, Optional, Set, Tuple
@@ -604,94 +606,131 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
         Raises:
             ShadowBanError if a shadow-banned requester attempts to send an invite.
         """
-        logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-        logger.info(requester)
-        logger.info(target)
-        logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-        conn = psycopg2.connect(
-        dbname="matrix_synapse",
-        user="matrix_synapse_rw",
-        password="m@trix!",
-        host="postgres",  # Sử dụng tên dịch vụ Docker
-        port="5432"
-        )
+        is_active = False
+        try:
+            logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            logger.info(requester)
+            logger.info(target)
+            logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            conn = psycopg2.connect(
+            dbname="matrix_synapse",
+            user="matrix_synapse_rw",
+            password="m@trix!",
+            host="postgres",  # Sử dụng tên dịch vụ Docker
+            port="5432"
+            )
 
-        cur = conn.cursor()
+            cur = conn.cursor()
 
 
 
 
-        room_id_temp = room_id
+            room_id_temp = room_id
 
-        cur.execute("""
-            SELECT creator
-            FROM rooms
-            WHERE room_id = %s
-        """, (room_id_temp,))
+            cur.execute("""
+                SELECT creator
+                FROM rooms
+                WHERE room_id = %s
+            """, (room_id_temp,))
 
-        creator = cur.fetchone()
-        logger.info(creator[0])
-        cur.close()
-        conn.close()
-        if ratelimit:
-            if action == Membership.JOIN:
-                # Only rate-limit if the user isn't already joined to the room, otherwise
-                # we'll end up blocking profile updates.
-                (
-                    current_membership,
-                    _,
-                ) = await self.store.get_local_current_membership_for_user_in_room(
-                    requester.user.to_string(),
-                    room_id,
-                )
-                if current_membership != Membership.JOIN:
-                    await self._join_rate_limiter_local.ratelimit(requester)
-                    await self._join_rate_per_room_limiter.ratelimit(
-                        requester, key=room_id, update=False
+            creator = cur.fetchone()
+            logger.info(creator[0])
+            cur.close()
+            conn.close()
+            user_id = target.user.to_string()    
+            username = user_id.split(':')[0].lstrip('@')
+            web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
+
+            # ABI for the contract
+            abi = [
+                {"inputs": [{"internalType": "address", "name": "spaceOwner", "type": "address"}, 
+                            {"internalType": "string", "name": "roomId", "type": "string"}, 
+                            {"internalType": "address", "name": "subscriber", "type": "address"}], 
+                "name": "isSubscriptionActive", 
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}], 
+                "stateMutability": "view", 
+                "type": "function"}
+            ]
+            
+            # Contract address
+            contract_address = '0x776cFb4026a3cA7E1e4524E416d86a1F80D6c57D'
+
+            # Initialize the contract
+            contract = web3.eth.contract(address=contract_address, abi=abi)
+
+            # Define the parameters
+            space_owner = str(creator[0]) # The space owner's address
+            room_id = room_id_temp # The room ID you're interested in
+            subscriber = username  # The subscriber's address
+
+            # Convert addresses to checksum address format
+            space_owner = Web3.to_checksum_address(space_owner)
+            subscriber = Web3.to_checksum_address(subscriber)
+
+            # Call the function with the correct types
+            is_active = contract.functions.isSubscriptionActive(space_owner, room_id, subscriber).call()
+        except Exception as e:
+            logger.info("errorrr contract")
+        if is_active == True:
+            if ratelimit:
+                if action == Membership.JOIN:
+                    # Only rate-limit if the user isn't already joined to the room, otherwise
+                    # we'll end up blocking profile updates.
+                    (
+                        current_membership,
+                        _,
+                    ) = await self.store.get_local_current_membership_for_user_in_room(
+                        requester.user.to_string(),
+                        room_id,
                     )
-            elif action == Membership.INVITE:
-                await self.ratelimit_invite(requester, room_id, target.to_string())
-
-        if action == Membership.INVITE and requester.shadow_banned:
-            # We randomly sleep a bit just to annoy the requester.
-            await self.clock.sleep(random.randint(1, 10))
-            raise ShadowBanError()
-
-        key = (room_id,)
-
-        as_id = object()
-        if requester.app_service:
-            as_id = requester.app_service.id
-
-        # We first linearise by the application service (to try to limit concurrent joins
-        # by application services), and then by room ID.
-        async with self.member_as_limiter.queue(as_id):
-            async with self.member_linearizer.queue(key):
-                async with self._worker_lock_handler.acquire_read_write_lock(
-                    NEW_EVENT_DURING_PURGE_LOCK_NAME, room_id, write=False
-                ):
-                    with opentracing.start_active_span("update_membership_locked"):
-                        result = await self.update_membership_locked(
-                            requester,
-                            target,
-                            room_id,
-                            action,
-                            txn_id=txn_id,
-                            remote_room_hosts=remote_room_hosts,
-                            third_party_signed=third_party_signed,
-                            ratelimit=ratelimit,
-                            content=content,
-                            new_room=new_room,
-                            require_consent=require_consent,
-                            outlier=outlier,
-                            allow_no_prev_events=allow_no_prev_events,
-                            prev_event_ids=prev_event_ids,
-                            state_event_ids=state_event_ids,
-                            depth=depth,
-                            origin_server_ts=origin_server_ts,
+                    if current_membership != Membership.JOIN:
+                        await self._join_rate_limiter_local.ratelimit(requester)
+                        await self._join_rate_per_room_limiter.ratelimit(
+                            requester, key=room_id, update=False
                         )
+                elif action == Membership.INVITE:
+                    await self.ratelimit_invite(requester, room_id, target.to_string())
 
-        return result
+            if action == Membership.INVITE and requester.shadow_banned:
+                # We randomly sleep a bit just to annoy the requester.
+                await self.clock.sleep(random.randint(1, 10))
+                raise ShadowBanError()
+
+            key = (room_id,)
+
+            as_id = object()
+            if requester.app_service:
+                as_id = requester.app_service.id
+
+            # We first linearise by the application service (to try to limit concurrent joins
+            # by application services), and then by room ID.
+            async with self.member_as_limiter.queue(as_id):
+                async with self.member_linearizer.queue(key):
+                    async with self._worker_lock_handler.acquire_read_write_lock(
+                        NEW_EVENT_DURING_PURGE_LOCK_NAME, room_id, write=False
+                    ):
+                        with opentracing.start_active_span("update_membership_locked"):
+                            result = await self.update_membership_locked(
+                                requester,
+                                target,
+                                room_id,
+                                action,
+                                txn_id=txn_id,
+                                remote_room_hosts=remote_room_hosts,
+                                third_party_signed=third_party_signed,
+                                ratelimit=ratelimit,
+                                content=content,
+                                new_room=new_room,
+                                require_consent=require_consent,
+                                outlier=outlier,
+                                allow_no_prev_events=allow_no_prev_events,
+                                prev_event_ids=prev_event_ids,
+                                state_event_ids=state_event_ids,
+                                depth=depth,
+                                origin_server_ts=origin_server_ts,
+                            )
+
+            return result
 
     async def update_membership_locked(
         self,
