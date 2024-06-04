@@ -1100,6 +1100,7 @@ class RoomMembershipRestServlet(TransactionRestServlet):
                 content=event_content,
                 isCreate=True,
             )
+            logger.info("teststtttttttttt")
         except ShadowBanError:
             # Pretend the request succeeded.
             pass
