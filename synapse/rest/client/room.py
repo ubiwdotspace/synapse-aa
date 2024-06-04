@@ -329,6 +329,7 @@ class RoomStateEventRestServlet(RestServlet):
         try:
             if event_type == EventTypes.Member:
                 membership = content.get("membership", None)
+                logger.info("13loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                 event_id, _ = await self.room_member_handler.update_membership(
                     requester,
                     target=UserID.from_string(state_key),
@@ -336,6 +337,7 @@ class RoomStateEventRestServlet(RestServlet):
                     action=membership,
                     content=content,
                     origin_server_ts=origin_server_ts,
+                    isCreate=False,
                 )
             else:
                 event_dict: JsonDict = {
@@ -473,6 +475,7 @@ class JoinRoomAliasServlet(ResolveRoomIdMixin, TransactionRestServlet):
             room_identifier,
             remote_room_hosts,
         )
+        logger.info("13loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
 
         await self.room_member_handler.update_membership(
             requester=requester,
@@ -483,6 +486,7 @@ class JoinRoomAliasServlet(ResolveRoomIdMixin, TransactionRestServlet):
             remote_room_hosts=remote_room_hosts,
             content=content,
             third_party_signed=content.get("third_party_signed", None),
+            isCreate=False,
         )
 
         return 200, {"room_id": room_id}
@@ -1085,6 +1089,7 @@ class RoomMembershipRestServlet(TransactionRestServlet):
             event_content = {"reason": content["reason"]}
 
         try:
+            logger.info("14loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
             await self.room_member_handler.update_membership(
                 requester=requester,
                 target=target,
@@ -1093,6 +1098,7 @@ class RoomMembershipRestServlet(TransactionRestServlet):
                 txn_id=txn_id,
                 third_party_signed=content.get("third_party_signed", None),
                 content=event_content,
+                isCreate=False,
             )
         except ShadowBanError:
             # Pretend the request succeeded.

@@ -76,7 +76,7 @@ class KnockRoomAliasServlet(RestServlet):
             raise SynapseError(
                 400, "%s was not legal room ID or room alias" % (room_identifier,)
             )
-
+        logger.info("12loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
         await self.room_member_handler.update_membership(
             requester=requester,
             target=requester.user,
@@ -85,6 +85,7 @@ class KnockRoomAliasServlet(RestServlet):
             third_party_signed=None,
             remote_room_hosts=remote_room_hosts,
             content=event_content,
+            isCreate=False,
         )
 
         return 200, {"room_id": room_id}

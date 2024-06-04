@@ -565,6 +565,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
         state_event_ids: Optional[List[str]] = None,
         depth: Optional[int] = None,
         origin_server_ts: Optional[int] = None,
+        isCreate: bool = True,
     ) -> Tuple[str, int]:
         """Update a user's membership in a room.
 

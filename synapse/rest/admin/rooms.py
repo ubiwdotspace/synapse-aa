@@ -518,6 +518,7 @@ class JoinRoomAliasServlet(ResolveRoomIdMixin, RestServlet):
                 # update_membership with an action of "invite" can raise a
                 # ShadowBanError. This is not handled since it is assumed that
                 # an admin isn't going to call this API with a shadow-banned user.
+                logger.info("9loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                 await self.room_member_handler.update_membership(
                     requester=requester,
                     target=fake_requester.user,
@@ -525,7 +526,9 @@ class JoinRoomAliasServlet(ResolveRoomIdMixin, RestServlet):
                     action="invite",
                     remote_room_hosts=remote_room_hosts,
                     ratelimit=False,
+                    isCreate=False,
                 )
+        logger.info("10loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
 
         await self.room_member_handler.update_membership(
             requester=fake_requester,
@@ -534,6 +537,8 @@ class JoinRoomAliasServlet(ResolveRoomIdMixin, RestServlet):
             action="join",
             remote_room_hosts=remote_room_hosts,
             ratelimit=False,
+            isCreate=False,
+
         )
 
         return HTTPStatus.OK, {"room_id": room_id}
@@ -684,12 +689,13 @@ class MakeRoomAdminRestServlet(ResolveRoomIdMixin, RestServlet):
 
         if is_public:
             return HTTPStatus.OK, {}
-
+        logger.info("11loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
         await self.room_member_handler.update_membership(
             fake_requester,
             target=UserID.from_string(user_to_add),
             room_id=room_id,
             action=Membership.INVITE,
+            isCreate=False,
         )
 
         return HTTPStatus.OK, {}

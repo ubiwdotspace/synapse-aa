@@ -206,6 +206,7 @@ class DeactivateAccountHandler:
                     "leave",
                     ratelimit=False,
                     require_consent=False,
+                    isCreate=True,
                 )
                 logger.info(
                     "Rejected invite for deactivated user %r in room %r",
@@ -260,6 +261,7 @@ class DeactivateAccountHandler:
                     "leave",
                     ratelimit=False,
                     require_consent=False,
+                    isCreate=True,
                 )
             except Exception:
                 logger.exception(

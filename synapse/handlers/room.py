@@ -599,6 +599,7 @@ class RoomCreationHandler:
                 "membership" in old_event.content
                 and old_event.content["membership"] == "ban"
             ):
+                logger.info("5loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                 await self.room_member_handler.update_membership(
                     requester,
                     UserID.from_string(old_event.state_key),
@@ -606,6 +607,7 @@ class RoomCreationHandler:
                     "ban",
                     ratelimit=False,
                     content=old_event.content,
+                    isCreate=True,
                 )
 
         # XXX invites/joins
@@ -1251,7 +1253,7 @@ class RoomCreationHandler:
             ignore_shadow_ban=True,
         )
         last_sent_event_id = ev.event_id
-
+        logger.info("6loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
         member_event_id, _ = await self.room_member_handler.update_membership(
             creator,
             creator.user,
@@ -1262,6 +1264,8 @@ class RoomCreationHandler:
             new_room=True,
             prev_event_ids=[last_sent_event_id],
             depth=depth,
+            isCreate=False,
+
         )
         prev_event = [member_event_id]
 
@@ -2086,6 +2090,7 @@ class RoomShutdownHandler:
                 target_requester = create_requester(
                     user_id, authenticated_entity=requester_user_id
                 )
+                logger.info("7loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                 _, stream_id = await self.room_member_handler.update_membership(
                     requester=target_requester,
                     target=target_requester.user,
@@ -2094,6 +2099,7 @@ class RoomShutdownHandler:
                     content={},
                     ratelimit=False,
                     require_consent=False,
+                    isCreate=True,
                 )
 
                 # Wait for leave to come in over replication before trying to forget.
@@ -2110,6 +2116,7 @@ class RoomShutdownHandler:
                 # Join users to new room
                 if new_room_user_id:
                     assert new_room_id is not None
+                    logger.info("8loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                     await self.room_member_handler.update_membership(
                         requester=target_requester,
                         target=target_requester.user,
@@ -2118,6 +2125,7 @@ class RoomShutdownHandler:
                         content={},
                         ratelimit=False,
                         require_consent=False,
+                        isCreate=False,
                     )
 
                 result["kicked_users"].append(user_id)

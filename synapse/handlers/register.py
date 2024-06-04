@@ -454,7 +454,7 @@ class RegistrationHandler:
                         remote_room_hosts,
                     ) = await room_member_handler.lookup_room_alias(room_alias)
                     room_id = room.to_string()
-
+                    logger.info("1loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                     await room_member_handler.update_membership(
                         requester=create_requester(
                             user_id, authenticated_entity=self._server_name
@@ -464,6 +464,7 @@ class RegistrationHandler:
                         remote_room_hosts=remote_room_hosts,
                         action="join",
                         ratelimit=False,
+                        isCreate=True,
                     )
                 else:
                     # A shallow copy is OK here since the only key that is
@@ -481,6 +482,8 @@ class RegistrationHandler:
                     # If the room does not require an invite, but another user
                     # created it, then ensure the first user joins it.
                     if requires_join:
+                        logger.info("2loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
+
                         await room_member_handler.update_membership(
                             requester=create_requester(
                                 user_id, authenticated_entity=self._server_name
@@ -491,6 +494,7 @@ class RegistrationHandler:
                             remote_room_hosts=[],
                             action="join",
                             ratelimit=False,
+                            isCreate=True,
                         )
             except Exception as e:
                 logger.error("Failed to join new user to %r: %r", r, e)
@@ -553,6 +557,7 @@ class RegistrationHandler:
                 if requires_invite:
                     # If an invite is required, there must be a auto-join user ID.
                     assert self.hs.config.registration.auto_join_user_id
+                    logger.info("3loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
 
                     await room_member_handler.update_membership(
                         requester=create_requester(
@@ -564,9 +569,11 @@ class RegistrationHandler:
                         remote_room_hosts=remote_room_hosts,
                         action="invite",
                         ratelimit=False,
+                        isCreate=False,
                     )
 
                 # Send the join.
+                logger.info("4loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
                 await room_member_handler.update_membership(
                     requester=create_requester(
                         user_id, authenticated_entity=self._server_name
@@ -576,6 +583,7 @@ class RegistrationHandler:
                     remote_room_hosts=remote_room_hosts,
                     action="join",
                     ratelimit=False,
+                    isCreate=False,
                 )
 
             except ConsentNotGivenError as e:
