@@ -636,8 +636,24 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
 
             creator = cur.fetchone()
             logger.info(creator[0])
+
+
+
+
+
+            cur.execute("""
+                SELECT room_type
+                FROM rooms
+                WHERE room_id = %s
+            """, (room_id_temp,))
+            room_type = cur.fetchone()
+            logger.info(room_type[0])
+
             cur.close()
             conn.close()
+            is_space =  str(room_type[0])
+            if(is_space =="m.space"):
+                isCreate =True
             user_id = str(target)
             username = user_id.split(':')[0].lstrip('@')
             web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
