@@ -608,72 +608,72 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             ShadowBanError if a shadow-banned requester attempts to send an invite.
         """
         is_active = False
-        try:
-            logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-            logger.info(requester)
-            logger.info(target)
-            logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-            conn = psycopg2.connect(
-            dbname="matrix_synapse",
-            user="matrix_synapse_rw",
-            password="m@trix!",
-            host="postgres",  # Sử dụng tên dịch vụ Docker
-            port="5432"
-            )
+        # try:
+        logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+        logger.info(requester)
+        logger.info(target)
+        logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+        conn = psycopg2.connect(
+        dbname="matrix_synapse",
+        user="matrix_synapse_rw",
+        password="m@trix!",
+        host="postgres",  # Sử dụng tên dịch vụ Docker
+        port="5432"
+        )
 
-            cur = conn.cursor()
-
-
+        cur = conn.cursor()
 
 
-            room_id_temp = room_id
 
-            cur.execute("""
-                SELECT creator
-                FROM rooms
-                WHERE room_id = %s
-            """, (room_id_temp,))
 
-            creator = cur.fetchone()
-            logger.info(creator[0])
-            cur.close()
-            conn.close()
-            user_id = target.user.to_string()    
-            username = user_id.split(':')[0].lstrip('@')
-            web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
+        room_id_temp = room_id
 
-            # ABI for the contract
-            abi = [
-                {"inputs": [{"internalType": "address", "name": "spaceOwner", "type": "address"}, 
-                            {"internalType": "string", "name": "roomId", "type": "string"}, 
-                            {"internalType": "address", "name": "subscriber", "type": "address"}], 
-                "name": "isSubscriptionActive", 
-                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}], 
-                "stateMutability": "view", 
-                "type": "function"}
-            ]
-            
-            # Contract address
-            contract_address = '0x776cFb4026a3cA7E1e4524E416d86a1F80D6c57D'
+        cur.execute("""
+            SELECT creator
+            FROM rooms
+            WHERE room_id = %s
+        """, (room_id_temp,))
 
-            # Initialize the contract
-            contract = web3.eth.contract(address=contract_address, abi=abi)
+        creator = cur.fetchone()
+        logger.info(creator[0])
+        cur.close()
+        conn.close()
+        user_id = target.user.to_string()    
+        username = user_id.split(':')[0].lstrip('@')
+        web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
 
-            # Define the parameters
-            space_owner = str(creator[0]) # The space owner's address
-            room_id = room_id_temp # The room ID you're interested in
-            subscriber = username  # The subscriber's address
+        # ABI for the contract
+        abi = [
+            {"inputs": [{"internalType": "address", "name": "spaceOwner", "type": "address"}, 
+                        {"internalType": "string", "name": "roomId", "type": "string"}, 
+                        {"internalType": "address", "name": "subscriber", "type": "address"}], 
+            "name": "isSubscriptionActive", 
+            "outputs": [{"internalType": "bool", "name": "", "type": "bool"}], 
+            "stateMutability": "view", 
+            "type": "function"}
+        ]
+        
+        # Contract address
+        contract_address = '0x776cFb4026a3cA7E1e4524E416d86a1F80D6c57D'
 
-            # Convert addresses to checksum address format
-            space_owner = Web3.to_checksum_address(space_owner)
-            subscriber = Web3.to_checksum_address(subscriber)
+        # Initialize the contract
+        contract = web3.eth.contract(address=contract_address, abi=abi)
 
-            # Call the function with the correct types
-            logger.info("chubedoiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
-            is_active = contract.functions.isSubscriptionActive(space_owner, room_id, subscriber).call()
-            logger.info(is_active)
-        except Exception as e:
-            logger.info("errorrr contract")
+        # Define the parameters
+        space_owner = str(creator[0]) # The space owner's address
+        room_id = room_id_temp # The room ID you're interested in
+        subscriber = username  # The subscriber's address
+
+        # Convert addresses to checksum address format
+        space_owner = Web3.to_checksum_address(space_owner)
+        subscriber = Web3.to_checksum_address(subscriber)
+
+        # Call the function with the correct types
+        logger.info("chubedoiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
+        is_active = contract.functions.isSubscriptionActive(space_owner, room_id, subscriber).call()
+        logger.info(is_active)
+        # except Exception as e:
+        #     logger.info("errorrr contract")
         if is_active == True or isCreate ==True:
             logger.info("passssssssssss")
             if ratelimit:
