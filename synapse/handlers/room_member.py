@@ -15,7 +15,7 @@
 import abc
 import logging
 from web3 import Web3
-
+import json
 import random
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Iterable, List, Optional, Set, Tuple
@@ -641,19 +641,24 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
 
 
 
-            cur.execute("""
-                SELECT room_type
-                FROM rooms
-                WHERE room_id = %s
-            """, (room_id_temp,))
-            room_type = cur.fetchone()
-            logger.info(room_type[0])
+            query = """
+            SELECT content
+            FROM state_events
+            WHERE room_id = %s AND type = 'm.room.room_type' AND state_key = '';
+            """
+            cur.execute(query, (room_id_temp,))
+            room_type = cur.fetchone()  
+            if room_type:
+                # Assuming the room type is stored in a JSON field called 'content'
+                content = json.loads(room_type[0])
+                is_room = content.get('room_type')  # Adjust the key based on actual JSON structure
+                if(str(is_room) =="m.space"):
+                    isCreate = True
+
 
             cur.close()
             conn.close()
-            is_space =  str(room_type[0])
-            if(is_space =="m.space"):
-                isCreate =True
+            
             user_id = str(target)
             username = user_id.split(':')[0].lstrip('@')
             web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
