@@ -658,9 +658,10 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
 
         # Initialize the contract
         contract = web3.eth.contract(address=contract_address, abi=abi)
-
+        creator_temp =str(creator[0])
+        creator_temp = creator_temp.split(':')[0].lstrip('@')
         # Define the parameters
-        space_owner = str(creator[0]) # The space owner's address
+        space_owner = creator_temp # The space owner's address
         room_id = room_id_temp # The room ID you're interested in
         subscriber = username  # The subscriber's address
 
