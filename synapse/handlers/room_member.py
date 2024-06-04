@@ -668,7 +668,9 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             subscriber = Web3.to_checksum_address(subscriber)
 
             # Call the function with the correct types
+            logger.info("chubedoiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
             is_active = contract.functions.isSubscriptionActive(space_owner, room_id, subscriber).call()
+            logger.info(is_active)
         except Exception as e:
             logger.info("errorrr contract")
         if is_active == True:
