@@ -638,7 +638,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
         logger.info(creator[0])
         cur.close()
         conn.close()
-        user_id = target.user.to_string()    
+        user_id = str(target)
         username = user_id.split(':')[0].lstrip('@')
         web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
 
