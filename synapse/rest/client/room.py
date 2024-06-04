@@ -1098,7 +1098,7 @@ class RoomMembershipRestServlet(TransactionRestServlet):
                 txn_id=txn_id,
                 third_party_signed=content.get("third_party_signed", None),
                 content=event_content,
-                isCreate=False,
+                isCreate=True,
             )
         except ShadowBanError:
             # Pretend the request succeeded.
