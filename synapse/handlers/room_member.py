@@ -674,7 +674,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             logger.info(is_active)
         except Exception as e:
             logger.info("errorrr contract")
-        if is_active == True:
+        if is_active == True or isCreate ==True:
             if ratelimit:
                 if action == Membership.JOIN:
                     # Only rate-limit if the user isn't already joined to the room, otherwise

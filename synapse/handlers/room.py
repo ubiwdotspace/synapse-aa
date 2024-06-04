@@ -1264,7 +1264,7 @@ class RoomCreationHandler:
             new_room=True,
             prev_event_ids=[last_sent_event_id],
             depth=depth,
-            isCreate=False,
+            isCreate=True,
 
         )
         prev_event = [member_event_id]
