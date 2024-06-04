@@ -642,23 +642,23 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
 
 
             query = """
-            SELECT content
-            FROM state_events
-            WHERE room_id = %s AND type = 'm.room.room_type' AND state_key = '';
+                SELECT creator
+                FROM rooms
             """
-            cur.execute(query, (room_id_temp,))
+            cur.execute(query)
             room_type = cur.fetchone()  
-            if room_type:
-                # Assuming the room type is stored in a JSON field called 'content'
-                content = json.loads(room_type[0])
-                is_room = content.get('room_type')  # Adjust the key based on actual JSON structure
-                if(str(is_room) =="m.space"):
-                    isCreate = True
+            logger.info(room_type[0])
+            # if room_type:
+            #     # Assuming the room type is stored in a JSON field called 'content'
+            #     content = json.loads(room_type[0])
+            #     is_room = content.get('room_type')  # Adjust the key based on actual JSON structure
+            #     if(str(is_room) =="m.space"):
+            #         isCreate = True
 
 
             cur.close()
             conn.close()
-            
+
             user_id = str(target)
             username = user_id.split(':')[0].lstrip('@')
             web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
