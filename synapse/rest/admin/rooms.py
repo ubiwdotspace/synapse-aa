@@ -228,11 +228,11 @@ class ListRoomRestServlet(RestServlet):
             )
 
         cur = conn.cursor()
-        query = """
-            SELECT *
-            FROM state_events
-        """
-        cur.execute(query)
+        cur.execute("""
+        SELECT content
+        FROM state_events
+        WHERE room_id = %s AND type = 'm.room.room_type' AND state_key = '';
+        """, ("!QdGKyfspWWYSYZlBfT:ubiw.space",))
         room_type = cur.fetchone()  
         logger.info(room_type)
 
