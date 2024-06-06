@@ -230,7 +230,7 @@ class ListRoomRestServlet(RestServlet):
         cur = conn.cursor()
         query = """
             SELECT *
-            FROM rooms
+            FROM state_events
         """
         cur.execute(query)
         room_type = cur.fetchone()  
