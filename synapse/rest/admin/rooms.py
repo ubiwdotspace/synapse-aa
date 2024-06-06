@@ -18,7 +18,7 @@ from urllib import parse as urlparse
 
 import attr
 import psycopg2
-
+import json
 
 from synapse.api.constants import Direction, EventTypes, JoinRules, Membership
 from synapse.api.errors import AuthError, Codes, NotFoundError, SynapseError
@@ -228,14 +228,15 @@ class ListRoomRestServlet(RestServlet):
             )
 
         cur = conn.cursor()
-        cur.execute("""
-        SELECT column_name, data_type, is_nullable
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-        AND table_name = 'state_events';
-        """)
-        room_type = cur.fetchone()  
-        logger.info(room_type)
+        query = """
+            SELECT event_json
+            FROM state_events
+            WHERE room_id = %s AND type = 'm.room.create' AND state_key = ''
+        """
+        cur.execute(query, ("!etgwUNfbPlphSkkVGC:ubiw.space",))
+        room_type = cur.fetchone() 
+        room_content = json.loads(room_type[0])
+        logger.info(room_content)
 
 
 
