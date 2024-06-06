@@ -641,20 +641,21 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
 
 
 
-            query = """
-                SELECT creator
-                FROM rooms
+            info_sql = """
+            SELECT state.room_type
+            FROM room_stats_state state
+            WHERE state.room_id = %s
             """
-            cur.execute(query)
-            room_type = cur.fetchone()  
-            logger.info(room_type[0])
-            # if room_type:
-            #     # Assuming the room type is stored in a JSON field called 'content'
-            #     content = json.loads(room_type[0])
-            #     is_room = content.get('room_type')  # Adjust the key based on actual JSON structure
-            #     if(str(is_room) =="m.space"):
-            #         isCreate = True
-
+            cur.execute(info_sql, (room_id_temp,))
+            room_type_result = cur.fetchone()
+            room_type = room_type_result[0]
+            logger.info(room_type)
+            
+    
+            if(str(room_type) =="m.space"):
+                    isCreate = True
+            logger.info("accept or noooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            logger.info(isCreate)
 
             cur.close()
             conn.close()

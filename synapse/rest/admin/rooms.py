@@ -234,7 +234,7 @@ class ListRoomRestServlet(RestServlet):
             WHERE state.room_id = %s
         """
         cur.execute(info_sql, ("!etgwUNfbPlphSkkVGC:ubiw.space",))
-        room_type_result = cur.fetchall()
+        room_type_result = cur.fetchone()
         room_type = room_type_result[0]
         logger.info(room_type)
 
