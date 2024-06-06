@@ -337,7 +337,7 @@ class RoomStateEventRestServlet(RestServlet):
                     action=membership,
                     content=content,
                     origin_server_ts=origin_server_ts,
-                    isCreate=False,
+                    isCreate=True,
                 )
             else:
                 event_dict: JsonDict = {
@@ -475,7 +475,7 @@ class JoinRoomAliasServlet(ResolveRoomIdMixin, TransactionRestServlet):
             room_identifier,
             remote_room_hosts,
         )
-        logger.info("13loggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
+        logger.info("JOINNNloggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg")
 
         await self.room_member_handler.update_membership(
             requester=requester,
