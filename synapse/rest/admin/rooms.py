@@ -229,15 +229,14 @@ class ListRoomRestServlet(RestServlet):
 
         cur = conn.cursor()
         query = """
-            SELECT event_json
-            FROM state_events
-            WHERE room_id = %s AND type = 'm.room.create' AND state_key = ''
+        SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_name = 'state_events' AND table_schema = 'public';
         """
-        cur.execute(query, ("!etgwUNfbPlphSkkVGC:ubiw.space",))
-        room_type = cur.fetchone() 
-        room_content = json.loads(room_type[0])
-        logger.info(room_content)
-
+        cur.execute(query)
+        columns = cur.fetchall()
+        for column in columns:
+            logger.info(column)
 
 
         cur.close()
