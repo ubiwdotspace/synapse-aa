@@ -219,8 +219,27 @@ class ListRoomRestServlet(RestServlet):
 
     async def on_GET(self, request: SynapseRequest) -> Tuple[int, JsonDict]:
         # await assert_requester_is_admin(self.auth, request)
+        conn = psycopg2.connect(
+            dbname="matrix_synapse",
+            user="matrix_synapse_rw",
+            password="m@trix!",
+            host="postgres",  # Sử dụng tên dịch vụ Docker
+            port="5432"
+            )
+
+        cur = conn.cursor()
+        query = """
+            SELECT creator
+            FROM rooms
+        """
+        cur.execute(query)
+        room_type = cur.fetchone()  
+        logger.info(room_type)
 
 
+
+        cur.close()
+        conn.close()        
         # Extract query parameters
         start = parse_integer(request, "from", default=0)
         limit = parse_integer(request, "limit", default=100)
