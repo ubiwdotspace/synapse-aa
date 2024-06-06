@@ -229,6 +229,7 @@ class ListRoomRestServlet(RestServlet):
 
         cur = conn.cursor()
         query = """
+            SELECT *
             FROM rooms
         """
         cur.execute(query)
