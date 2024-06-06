@@ -623,7 +623,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
 
             cur = conn.cursor()
 
-
+            logger.info(room_id)
 
 
             room_id_temp = room_id
