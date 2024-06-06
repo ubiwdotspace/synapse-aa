@@ -229,7 +229,6 @@ class ListRoomRestServlet(RestServlet):
 
         cur = conn.cursor()
         query = """
-            SELECT creator
             FROM rooms
         """
         cur.execute(query)
