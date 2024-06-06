@@ -228,15 +228,15 @@ class ListRoomRestServlet(RestServlet):
             )
 
         cur = conn.cursor()
-        query = """
-        SELECT column_name, data_type
-        FROM information_schema.columns
-        WHERE table_name = 'state_events' AND table_schema = 'public';
+        info_sql = """
+            SELECT state.room_type
+            FROM room_stats_state state
+            WHERE state.room_id = %s
         """
-        cur.execute(query)
-        columns = cur.fetchall()
-        for column in columns:
-            logger.info(column)
+        cur.execute(info_sql, ("!etgwUNfbPlphSkkVGC:ubiw.space",))
+        room_type_result = cur.fetchall()
+        room_type = room_type_result[0]
+        logger.info(room_type)
 
 
         cur.close()
