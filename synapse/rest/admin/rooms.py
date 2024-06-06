@@ -218,7 +218,7 @@ class ListRoomRestServlet(RestServlet):
         self.admin_handler = hs.get_admin_handler()
 
     async def on_GET(self, request: SynapseRequest) -> Tuple[int, JsonDict]:
-        # await assert_requester_is_admin(self.auth, request)
+        await assert_requester_is_admin(self.auth, request)
         conn = psycopg2.connect(
             dbname="matrix_synapse",
             user="matrix_synapse_rw",

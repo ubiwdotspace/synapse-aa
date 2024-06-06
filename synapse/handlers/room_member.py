@@ -651,12 +651,12 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             room_type = room_type_result[0]
             logger.info(room_type)
             
-    
-            if(str(room_type) =="m.space"):
-                    isCreate = True
+            if(room_type):
+                if(str(room_type) =="m.space"):
+                        isCreate = True
+                
             logger.info("accept or noooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             logger.info(isCreate)
-
             cur.close()
             conn.close()
 
