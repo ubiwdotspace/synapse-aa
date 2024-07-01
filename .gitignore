@@ -1,4 +1,3 @@
-# filename patterns
 *~
 .*.swp
 .#*
@@ -15,12 +14,10 @@ _trial_temp*/
 .DS_Store
 __pycache__/
 
-# We do want poetry, cargo and flake lockfiles.
 !poetry.lock
 !Cargo.lock
 !flake.lock
 
-# stuff that is likely to exist when you run a server locally
 /*.db
 /*.log
 /*.log.*
@@ -36,19 +33,15 @@ __pycache__/
 /uploads
 /homeserver-config-overrides.d
 
-# For direnv users
 /.envrc
 .direnv/
 
-# For nix/devenv users
 .devenv/
 
-# IDEs
 /.idea/
 /.ropeproject/
 /.vscode/
 
-# build products
 !/.coveragerc
 /.coverage*
 /.mypy_cache/
@@ -62,19 +55,16 @@ __pycache__/
 /htmlcov
 /pip-wheel-metadata/
 
-# docs
 book/
 
-# complement
 /complement-*
 /main.tar.gz
 
-# rust
 /target/
 /synapse/*.so
 
-# Poetry will create a setup.py, which we don't want to include.
 /setup.py
 
-# Don't include users' poetry configs
 /poetry.toml
+
+/.env

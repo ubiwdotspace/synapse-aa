@@ -17,6 +17,8 @@ import logging
 from web3 import Web3
 import json
 import random
+import os
+from dotenv import load_dotenv
 from http import HTTPStatus
 from typing import TYPE_CHECKING, Iterable, List, Optional, Set, Tuple
 import psycopg2
@@ -613,13 +615,17 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             logger.info(requester)
             logger.info(target)
             logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-            
+            db_name = os.getenv("DB_NAME")
+            db_user = os.getenv("DB_USER")
+            db_password = os.getenv("DB_PASSWORD")
+            db_host = os.getenv("DB_HOST")
+            db_port = os.getenv("DB_PORT")
             conn = psycopg2.connect(
-            dbname="matrix_synapse",
-            user="matrix_synapse_rw",
-            password="m@trix!",
-            host="postgres",  # Sử dụng tên dịch vụ Docker
-            port="5432"
+            dbname=db_name,
+            user=db_user,
+            password=db_password,
+            host=db_host,  # Sử dụng tên dịch vụ Docker
+            port=db_port
             )
 
             cur = conn.cursor()
@@ -666,7 +672,9 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             if(creator[0]==user_id):
                 isCreate =True
             username = user_id.split(':')[0].lstrip('@')
-            web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
+            Infura = os.getenv("INFURA_ENDPOINT")
+            contract_address = os.getenv("CONTRACT_SPACE_ROOM_MANAGER")
+            web3 = Web3(Web3.HTTPProvider(Infura))
 
             # ABI for the contract
             abi = [
@@ -680,7 +688,6 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             ]
             
             # Contract address
-            contract_address = '0x776cFb4026a3cA7E1e4524E416d86a1F80D6c57D'
 
             # Initialize the contract
             contract = web3.eth.contract(address=contract_address, abi=abi)
