@@ -746,70 +746,6 @@ class RoomCreationHandler:
         user_id = requester.user.to_string()    
         username = user_id.split(':')[0].lstrip('@')
         try:
-            # url = "https://rpc.particle.network/evm-chain?chainId=11155111&projectUuid=70cca4db-cd66-41fb-9fad-477802236ae7&projectKey=c7rCaFkQbbbzMVQLFLjQ6fUIyjn7Ltri6rQ4ryqx"
-            # signer = web3.to_checksum_address(username)
-            # payload = {
-            #     "jsonrpc": "2.0",
-            #     "method": "particle_aa_getSmartAccount",
-            #     "params": [
-            #             {
-            #                 "name": "SIMPLE",
-            #                 "version": "1.0.0",
-            #                 "ownerAddress": signer
-            #                 }
-            #             ]
-            # }
-            # headers = {
-            #             "accept": "application/json",
-            #             "content-type": "application/json",
-            # }
-            # response = requests.post(url, json=payload, headers=headers)   
-            # data = json.loads(response.text)
-            # smart_account_address = data["result"][0]["smartAccountAddress"]
-
-            
-            # logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
-            # logger.info(smart_account_address)
-        
-
-            # Contract details
-        
-            # Connect to the network
-
-            # # Contract details
-
-            # # contract_address = Web3.to_checksum_address('0xa65a002569b6b60dc52413472e6485f67a9f9c42')
-            # contract_address = Web3.to_checksum_address('0x21d42cc2ecdb6db2c3d9b494d8cccb6674360912')
-            # abi = [
-            #     {
-            #         "constant": True,
-            #         "inputs": [
-            #             {
-            #                 "name": "owner",
-            #                 "type": "address"
-            #             }
-            #         ],
-            #         "name": "balanceOf",
-            #         "outputs": [
-            #             {
-            #                 "name": "",
-            #                 "type": "uint256"
-            #             }
-            #         ],
-            #         "payable": False,
-            #         "stateMutability": "view",
-            #         "type": "function"
-            #     }
-            # ]
-
-            # # Setup the contract
-            # contract = w3.eth.contract(address=contract_address, abi=abi)
-
-            # # Account address whose balance we want to check
-            # account_address = Web3.to_checksum_address(smart_account_address)
-
-            # # Call the balanceOf function
-            # balance = contract.functions.balanceOf(account_address).call()
             space_owner = "0x0000000000000000000000000000000000000000"
         
             contract_address = "0x776cFb4026a3cA7E1e4524E416d86a1F80D6c57D"
@@ -2047,7 +1983,7 @@ class RoomShutdownHandler:
             room_creator_requester = create_requester(
                 new_room_user_id, authenticated_entity=requester_user_id
             )
-
+            logger.info("2taooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             new_room_id, _, stream_id = await self._room_creation_handler.create_room(
                 room_creator_requester,
                 config={

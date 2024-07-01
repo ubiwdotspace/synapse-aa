@@ -180,6 +180,7 @@ class ServerNoticesManager:
 
         # `ignore_forced_encryption` is used to bypass `encryption_enabled_by_default_for_room_type`
         # setting if it set, since the server notices will not be encrypted anyway.
+        logger.info("4taooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         room_id, _, _ = await self._room_creation_handler.create_room(
             requester,
             config={

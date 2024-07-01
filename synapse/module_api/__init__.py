@@ -1778,6 +1778,7 @@ class ModuleApi:
             )
 
         requester = create_requester(user_id)
+        logger.info("1taooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         room_id, room_alias, _ = await self._hs.get_room_creation_handler().create_room(
             requester=requester,
             config=config,
