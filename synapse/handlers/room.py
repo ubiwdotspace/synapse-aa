@@ -746,6 +746,8 @@ class RoomCreationHandler:
         space_owner = "0x0000000000000000000000000000000000000000"
         Infura = os.getenv("INFURA_ENDPOINT")
         contract_address = os.getenv("CONTRACT_SPACE_ROOM_MANAGER")
+        logger.info(contract_address)
+        logger.info(Infura)
         web3 = Web3(Web3.HTTPProvider(Infura))
 
         smart_account_address="0x"
