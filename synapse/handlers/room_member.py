@@ -613,6 +613,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             logger.info(requester)
             logger.info(target)
             logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            os.getenv("DB_NAME")
             conn = psycopg2.connect(
             dbname="matrix_synapse",
             user="matrix_synapse_rw",

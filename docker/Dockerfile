@@ -140,6 +140,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --prefix="/install" --no-warn-script-location requests
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --prefix="/install" --no-warn-script-location python-dotenv
 # Copy over the rest of the synapse source code.
 COPY synapse /synapse/synapse/
 COPY rust /synapse/rust/

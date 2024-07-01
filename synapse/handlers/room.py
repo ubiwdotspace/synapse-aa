@@ -19,6 +19,8 @@ import math
 import random
 import string
 from web3 import Web3
+import os
+from dotenv import load_dotenv
 import json
 import requests
 from collections import OrderedDict
@@ -701,7 +703,6 @@ class RoomCreationHandler:
         self,
         requester: Requester,
         config: JsonDict,
-        Isdirect:bool=False,
         ratelimit: bool = True,
         creator_join_profile: Optional[JsonDict] = None,
         ignore_forced_encryption: bool = False,
@@ -737,11 +738,15 @@ class RoomCreationHandler:
                 if server is blocked to some resource being
                 exceeded
         """
+        load_dotenv()
         logger.info("123214241241heloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
         logger.info(config["room_id"])
+        Is_direct = config.get("is_direct")
         RID = str(config["room_id"])
         space_owner = "0x0000000000000000000000000000000000000000"
-        web3 = Web3(Web3.HTTPProvider('https://sepolia.infura.io/v3/7044d681d4984c5bbee28e572086b952'))
+        Infura = os.getenv("INFURA_ENDPOINT")
+        contract_address = os.getenv("CONTRACT_SPACE_ROOM_MANAGER")
+        web3 = Web3(Web3.HTTPProvider(Infura))
 
         smart_account_address="0x"
         user_id = requester.user.to_string()    
@@ -749,7 +754,6 @@ class RoomCreationHandler:
         try:
             space_owner = "0x0000000000000000000000000000000000000000"
         
-            contract_address = "0x776cFb4026a3cA7E1e4524E416d86a1F80D6c57D"
             abi = [
                 {
                     "inputs": [
@@ -785,7 +789,7 @@ class RoomCreationHandler:
             logger.info(space_owner)
         except Exception as e:
             logger.info("errorrr contract")
-        if(space_owner != "0x0000000000000000000000000000000000000000" or Isdirect == True):
+        if(space_owner != "0x0000000000000000000000000000000000000000" or Is_direct == True):
             await self.auth_blocking.check_auth_blocking(requester=requester)
 
             if (
