@@ -701,6 +701,7 @@ class RoomCreationHandler:
         self,
         requester: Requester,
         config: JsonDict,
+        Isdirect:bool=False,
         ratelimit: bool = True,
         creator_join_profile: Optional[JsonDict] = None,
         ignore_forced_encryption: bool = False,
@@ -784,7 +785,7 @@ class RoomCreationHandler:
             logger.info(space_owner)
         except Exception as e:
             logger.info("errorrr contract")
-        if(space_owner != "0x0000000000000000000000000000000000000000"):
+        if(space_owner != "0x0000000000000000000000000000000000000000" or Isdirect == True):
             await self.auth_blocking.check_auth_blocking(requester=requester)
 
             if (
