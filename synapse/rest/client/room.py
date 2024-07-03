@@ -468,7 +468,8 @@ class JoinRoomAliasServlet(ResolveRoomIdMixin, TransactionRestServlet):
         txn_id: Optional[str],
     ) -> Tuple[int, JsonDict]:
         content = parse_json_object_from_request(request, allow_empty_body=True)
-
+        logger("testttJoINasssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss")
+        logger.info(content)
         # twisted.web.server.Request.args is incorrectly defined as Optional[Any]
         args: Dict[bytes, List[bytes]] = request.args  # type: ignore
         remote_room_hosts = parse_strings_from_args(args, "server_name", required=False)
