@@ -611,6 +611,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
         """
         is_active = False
         try:
+            load_dotenv()
             logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             logger.info(requester)
             logger.info(target)
