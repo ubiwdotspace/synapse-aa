@@ -623,14 +623,14 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             db_password = os.getenv("DB_PASSWORD")
             db_host = os.getenv("DB_HOST")
             db_port = os.getenv("DB_PORT")
-            Infura = os.getenv("INFURA_ENDPOINT")
-            logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
-            logger.info(Infura)
-            logger.info(db_name)
-            logger.info(db_user)
-            logger.info(db_password)
-            logger.info(db_host)
-            logger.info(db_port)
+            # Infura = os.getenv("INFURA_ENDPOINT")
+            # logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+            # logger.info(Infura)
+            # logger.info(db_name)
+            # logger.info(db_user)
+            # logger.info(db_password)
+            # logger.info(db_host)
+            # logger.info(db_port)
             conn = psycopg2.connect(
             dbname=db_name,
             user=db_user,
