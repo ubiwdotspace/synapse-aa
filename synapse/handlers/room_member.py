@@ -622,6 +622,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             db_password = os.getenv("DB_PASSWORD")
             db_host = os.getenv("DB_HOST")
             db_port = os.getenv("DB_PORT")
+
             conn = psycopg2.connect(
             dbname=db_name,
             user=db_user,
@@ -629,7 +630,8 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             host=db_host,  # Sử dụng tên dịch vụ Docker
             port=db_port
             )
-
+            logger.info("dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+            logger.info(conn)
             cur = conn.cursor()
 
             logger.info(room_id)
