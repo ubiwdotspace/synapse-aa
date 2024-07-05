@@ -709,7 +709,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             is_active = contract.functions.isSubscriptionActive(space_owner, room_id, subscriber).call()
             logger.info(is_active)
         except Exception as e:
-            logger.info(e)
+            logger.info("3-2-----2424")
         if is_active == True or isCreate ==True or is_DM == True:
             logger.info("passssssssssss")
             if ratelimit:
