@@ -667,7 +667,8 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
                 for dm_rooms in content_json.values():
                     if room_id in dm_rooms:
                         isDirect = True
-                    
+            logger.info("lelelelelelelelll")
+            logger.info(isDirect)
             info_sql = """
             SELECT state.room_type
             FROM room_stats_state state
