@@ -655,19 +655,8 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             creator = cur.fetchone()
             logger.info(creator[0])
             
-            cur.execute('''
-                SELECT user_id, content
-                FROM account_data
-                WHERE account_data_type = 'm.direct';
-            ''')
-            rows = cur.fetchall()
-            quan = False
-            for user_id, content in rows:
-                content_json = json.loads(content)
-                for dm_rooms in content_json.values():
-                    if room_id_temp in dm_rooms:
-                        quan = True
-    
+
+
 
 
             info_sql = """
@@ -730,7 +719,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             logger.info(is_active)
         except Exception as e:
             logger.info("3-2-----2424")
-        if is_active == True or isCreate ==True or quan == True:
+        if is_active == True or isCreate ==True or is_DM == True:
             logger.info("passssssssssss")
             if ratelimit:
                 if action == Membership.JOIN:
