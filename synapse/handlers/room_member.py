@@ -615,7 +615,8 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             logger.info(requester)
             logger.info(target)
-           
+            is_DM = content.get("is_dm", False)
+            logger.info(is_DM)
             logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             db_name = os.getenv("DB_NAME")
             db_user = os.getenv("DB_USER")
@@ -661,15 +662,16 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
                 WHERE account_data_type = 'm.direct';
             ''')
             rows = cur.fetchall()
-            is_DM = False
+            quan = False
             for user_id, content in rows:
                 content_json = json.loads(content)
                 for dm_rooms in content_json.values():
                     if room_id in dm_rooms:
-                        is_DM = True
+                        quan = True
 
 
-
+            logger.info("lmaooooooooooooooooooooooooooooooooooooooooooooooo")
+            logger.info(quan)
             info_sql = """
             SELECT state.room_type
             FROM room_stats_state state
@@ -730,7 +732,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             logger.info(is_active)
         except Exception as e:
             logger.info("3-2-----2424")
-        if is_active == True or isCreate ==True or is_DM == True:
+        if is_active == True or isCreate ==True or quan == True:
             logger.info("passssssssssss")
             if ratelimit:
                 if action == Membership.JOIN:
