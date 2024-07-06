@@ -663,9 +663,9 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             ''')
             rows = cur.fetchall()
             vip = False
-            for user_id, content in rows:
-                content_json = json.loads(content)
-                for dm_rooms in content_json.values():
+            for user_id, vip1 in rows:
+                lmao = json.loads(vip1)
+                for dm_rooms in lmao.values():
                     if room_id in dm_rooms:
                         vip = True
             logger.info("vippppppppppppppppppppppppppppppppppppppppppppppppppppppppp")
