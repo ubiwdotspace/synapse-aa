@@ -615,8 +615,7 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
             logger.info("helooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             logger.info(requester)
             logger.info(target)
-            is_DM = content.get("is_dm", False)
-            logger.info(is_DM)
+           
             logger.info("Createorhelooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
             db_name = os.getenv("DB_NAME")
             db_user = os.getenv("DB_USER")
@@ -662,14 +661,14 @@ class RoomMemberHandler(metaclass=abc.ABCMeta):
                 WHERE account_data_type = 'm.direct';
             ''')
             rows = cur.fetchall()
-            vip = False
-            for user_id, vip1 in rows:
-                lmao = json.loads(vip1)
-                for dm_rooms in lmao.values():
+            is_DM = False
+            for user_id, payload in rows:
+                datadirect = json.loads(payload)
+                for dm_rooms in datadirect.values():
                     if room_id in dm_rooms:
-                        vip = True
+                        is_DM = True
             logger.info("vippppppppppppppppppppppppppppppppppppppppppppppppppppppppp")
-            logger.info(vip)
+            logger.info(is_DM)
 
             info_sql = """
             SELECT state.room_type
